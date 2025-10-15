@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIỂM TRA TRẮC NGHIỆM TIN HỌC 9 - THCS XUÂN THỚI THƯỢNG</title>
+    <style>
+        /* --- CSS STYLES --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        h1, h2, h3 {
+            color: #004d99;
+            text-align: center;
+        }
+        .header-title {
+            padding: 15px;
+            margin-bottom: 25px;
+            background-color: #e6f7ff;
+            border-radius: 10px;
+            border: 1px solid #99e6ff;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #fff3e0;
+            border-radius: 8px;
+            border: 1px solid #ffcc80;
+        }
+        .timer {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #d32f2f;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        #submit-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #submit-btn:hover { background-color: #45a049; }
+        #submit-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        #reset-btn, #review-btn {
+            background-color: #007bff;
+            color: white;
+            margin-left: 10px;
+        }
+        #reset-btn:hover, #review-btn:hover { background-color: #0056b3; }
+
+        .section-header {
+            background-color: #e0f7fa;
+            padding: 15px;
+            margin: 30px 0 15px 0;
+            border-radius: 10px;
+            border-left: 6px solid #00bcd4;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .question-group {
+            margin-bottom: 35px;
+            padding: 20px;
+            border: 1px solid #b3e5fc;
+            border-radius: 10px;
+            background-color: #f7feff;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 12px;
+            border-bottom: 1px dashed #cccccc;
+        }
+        .question p {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+            font-size: 1.05em;
+        }
+        .options label {
+            display: block;
+            padding: 10px 15px;
+            margin: 6px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+        }
+        .options label:hover {
+            background-color: #f0f8ff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .options input[type="radio"]:checked + label {
+            background-color: #ffe0b2; /* Màu cam nhạt khi chọn */
+            border-color: #ff9800;
+        }
+        .options input[type="radio"] {
+            display: none; /* Ẩn radio button gốc */
+        }
+        
+        /* Hiệu ứng sau khi nộp bài và xem lại */
+        .result-correct {
+            background-color: #d4edda !important;
+            color: #155724 !important;
+            border: 1px solid #c3e6cb !important;
+            font-weight: bold;
+        }
+        .result-incorrect {
+            background-color: #f8d7da !important;
+            color: #721c24 !important;
+            border: 1px solid #f5c6cb !important;
+        }
+
+        .results-box {
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 10px;
+            background-color: #e8f5e9;
+            border: 2px solid #4CAF50;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: none; /* Ẩn ban đầu */
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 2px dashed #99e6ff;
+            font-size: 0.95em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header-title">
+        <h1>TRƯỜNG THCS XUÂN THỚI THƯỢNG</h1>
+        <h2 style="color: #c0392b;">ÔN TẬP KIỂM TRA THƯỜNG XUYÊN TIN HỌC 9 HỌC KỲ 1</h2>
+        <h3 style="color: #2980b9;">NĂM HỌC 2025-2026</h3>
+    </div>
+    
+    <div class="controls">
+        <button id="reset-btn" onclick="resetQuiz()">Làm Lại Bài</button>
+        <div class="timer">Thời gian còn lại: <span id="time">15:00</span></div>
+        <div>
+            <button id="submit-btn" onclick="submitQuiz()">Nộp Bài</button>
+            <button id="review-btn" onclick="reviewAnswers()" style="display: none;">Xem Lại Bài Làm</button>
+        </div>
+    </div>
+    
+    <div id="results" class="results-box"></div>
+
+    <form id="quiz-form">
+        <div class="section-header">CHỦ ĐỀ 1. MÁY TÍNH VÀ CUỘC SỐNG - VAI TRÒ CỦA MÁY TÍNH TRONG ĐỜI SỐNG</div>
+
+        <div class="question-group">
+            <h4 style="color: #0056b3;">BÀI 1: BỘ XỬ LÍ THÔNG TIN Ở QUANH TA</h4>
+            
+            <h5 style="color: #27ae60;">1. NHẬN BIẾT (4 câu)</h5>
+
+            <div class="question" data-name="q1_1" data-correct="D">
+                <p>Câu 1: Phương án nào sau đây là ví dụ về thiết bị có gắn bộ xử lí thông tin trong **thương mại**?</p>
+                <div class="options">
+                    <input type="radio" id="q1_1_a" name="q1_1" value="A"><label for="q1_1_a">A. Máy điều hoà không khí.</label>
+                    <input type="radio" id="q1_1_b" name="q1_1" value="B"><label for="q1_1_b">B. Máy tính bỏ túi.</label>
+                    <input type="radio" id="q1_1_c" name="q1_1" value="C"><label for="q1_1_c">C. Máy chiếu trong lớp học.</label>
+                    <input type="radio" id="q1_1_d" name="q1_1" value="D"><label for="q1_1_d">D. Máy tính tiền POS.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q1_2" data-correct="B">
+                <p>Câu 2: Phương án nào sau đây là ví dụ về thiết bị có gắn bộ xử lí thông tin trong **y tế**?</p>
+                <div class="options">
+                    <input type="radio" id="q1_2_a" name="q1_2" value="A"><label for="q1_2_a">A. Ti vi.</label>
+                    <input type="radio" id="q1_2_b" name="q1_2" value="B"><label for="q1_2_b">B. Máy chụp cắt lớp vi tính.</label>
+                    <input type="radio" id="q1_2_c" name="q1_2" value="C"><label for="q1_2_c">C. Máy bán hàng tự động.</label>
+                    <input type="radio" id="q1_2_d" name="q1_2" value="D"><label for="q1_2_d">D. Máy giặt.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q1_3" data-correct="A">
+                <p>Câu 3: Phương án nào sau đây là ví dụ về thiết bị có gắn bộ xử lí thông tin trong lĩnh vực **công nghiệp**?</p>
+                <div class="options">
+                    <input type="radio" id="q1_3_a" name="q1_3" value="A"><label for="q1_3_a">A. Dây chuyền lắp ráp tự động.</label>
+                    <input type="radio" id="q1_3_b" name="q1_3" value="B"><label for="q1_3_b">B. Robot hút bụi.</label>
+                    <input type="radio" id="q1_3_c" name="q1_3" value="C"><label for="q1_3_c">C. Máy chụp X-quang.</label>
+                    <input type="radio" id="q1_3_d" name="q1_3" value="D"><label for="q1_3_d">D. Hệ thống thanh toán trong siêu thị.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q1_4" data-correct="C">
+                <p>Câu 4: Thiết bị nào sau đây **không** gắn bộ xử lí thông tin?</p>
+                <div class="options">
+                    <input type="radio" id="q1_4_a" name="q1_4" value="A"><label for="q1_4_a">A. Tủ lạnh.</label>
+                    <input type="radio" id="q1_4_b" name="q1_4" value="B"><label for="q1_4_b">B. Thiết bị nhận dạng khuôn mặt.</label>
+                    <input type="radio" id="q1_4_c" name="q1_4" value="C"><label for="q1_4_c">C. Bảng từ trắng.</label>
+                    <input type="radio" id="q1_4_d" name="q1_4" value="D"><label for="q1_4_d">D. Máy rút tiền tự động.</label>
+                </div>
+            </div>
+
+            <h5 style="color: #27ae60; margin-top: 30px;">2. THÔNG HIỂU (4 CÂU)</h5>
+
+            <div class="question" data-name="q1_5" data-correct="C">
+                <p>Câu 1: Phát biểu nào sau đây **sai**?</p>
+                <div class="options">
+                    <input type="radio" id="q1_5_a" name="q1_5" value="A"><label for="q1_5_a">A. Những thiết bị có gắn bộ xử lí thông tin có mặt khắp nơi xung quanh ta.</label>
+                    <input type="radio" id="q1_5_b" name="q1_5" value="B"><label for="q1_5_b">B. Trong hầu hết những lĩnh vực của khoa học và đời sống, những thiết bị có gắn bộ xử lí thông tin đều đóng vai trò quan trọng.</label>
+                    <input type="radio" id="q1_5_c" name="q1_5" value="C"><label for="q1_5_c">C. Hệ thống thu phí tự động trên đường cao tốc là một ví dụ về thiết bị có gắn bộ xử lí trong sản xuất công nghiệp.</label>
+                    <input type="radio" id="q1_5_d" name="q1_5" value="D"><label for="q1_5_d">D. Máy đo huyết áp điện tử là một ví dụ về thiết bị có gắn bộ xử lí trong lĩnh vực y học.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q1_6" data-correct="B">
+                <p>Câu 2: Phát biểu nào sau đây **sai**?</p>
+                <div class="options">
+                    <input type="radio" id="q1_6_a" name="q1_6" value="A"><label for="q1_6_a">A. Không chỉ trong máy tính cá nhân mới có bộ xử lí thông tin, xung quanh ta còn có nhiều thiết bị được gắn bộ xử lí thông tin, chúng có mặt khắp nơi và có trong nhiều lĩnh vực.</label>
+                    <input type="radio" id="q1_6_b" name="q1_6" value="B"><label for="q1_6_b">B. Máy siêu âm được sử dụng phổ biến trong y học để chụp hình một bộ phận bên trong cơ thể bệnh nhân từ nhiều góc độ và vị trí khác nhau.</label>
+                    <input type="radio" id="q1_6_c" name="q1_6" value="C"><label for="q1_6_c">C. Trong lĩnh vực hàng không, máy bay được trang bị hệ thống điều khiển điện tử bao gồm nhiều bộ xử lí giúp phi công điều khiển máy bay dễ dàng hơn.</label>
+                    <input type="radio" id="q1_6_d" name="q1_6" value="D"><label for="q1_6_d">D. Các loại máy tính là công cụ vô cùng quan trọng để thực hiện các nghiên cứu khoa học.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q1_7" data-correct="C">
+                <p>Câu 3: Đồng hồ thông minh có chức năng nào **khác** với đồng hồ thông thường?</p>
+                <div class="options">
+                    <input type="radio" id="q1_7_a" name="q1_7" value="A"><label for="q1_7_a">A. Xem giờ.</label>
+                    <input type="radio" id="q1_7_b" name="q1_7" value="B"><label for="q1_7_b">B. Hiển thị hình ảnh.</label>
+                    <input type="radio" id="q1_7_c" name="q1_7" value="C"><label for="q1_7_c">C. Theo dõi sức khoẻ.</label>
+                    <input type="radio" id="q1_7_d" name="q1_7" value="D"><label for="q1_7_d">D. Tự động điều chỉnh thời gian.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q1_8" data-correct="D">
+                <p>Câu 4: Phát biểu nào sau đây **sai**?</p>
+                <div class="options">
+                    <input type="radio" id="q1_8_a" name="q1_8" value="A"><label for="q1_8_a">A. Xung quanh chúng ta xuất hiện ngày càng nhiều thiết bị có bộ xử lí thông tin với tên gọi được kèm theo từ “thông minh”.</label>
+                    <input type="radio" id="q1_8_b" name="q1_8" value="B"><label for="q1_8_b">B. Mỗi loại thiết bị thông minh có những tính năng đặc biệt hơn so với trước đây.</label>
+                    <input type="radio" id="q1_8_c" name="q1_8" value="C"><label for="q1_8_c">C. Ti vi thông minh có khả năng kết nối với điện thoại di động và điều khiển được bằng điện thoại di động hoặc bằng giọng nói.</label>
+                    <input type="radio" id="q1_8_d" name="q1_8" value="D"><label for="q1_8_d">D. Cung cấp thông tin đầu ra cho bộ xử lí của thiết bị thông minh là những thiết bị điện tử có khả năng cảm nhận trạng thái của môi trường, chúng được gọi tắt là cảm biến.</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <h4 style="color: #0056b3;">BÀI 2: KHẢ NĂNG VÀ ỨNG DỤNG THỰC TẾ CỦA MÁY TÍNH</h4>
+
+            <h5 style="color: #27ae60;">1. NHẬN BIẾT (6 câu)</h5>
+
+            <div class="question" data-name="q2_1" data-correct="B">
+                <p>Câu 1: Học qua mạng Internet, học bằng giáo án điện tử là ứng dụng của Tin học trong:</p>
+                <div class="options">
+                    <input type="radio" id="q2_1_a" name="q2_1" value="A"><label for="q2_1_a">A. Giải trí</label>
+                    <input type="radio" id="q2_1_b" name="q2_1" value="B"><label for="q2_1_b">B. Giáo dục</label>
+                    <input type="radio" id="q2_1_c" name="q2_1" value="C"><label for="q2_1_c">C. Trí tuệ nhân tạo</label>
+                    <input type="radio" id="q2_1_d" name="q2_1" value="D"><label for="q2_1_d">D. Truyền thông</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q2_2" data-correct="A">
+                <p>Câu 2: Phần mềm trò chơi, xem phim, nghe nhạc,... là ứng dụng của Tin học trong:</p>
+                <div class="options">
+                    <input type="radio" id="q2_2_a" name="q2_2" value="A"><label for="q2_2_a">A. Giải trí</label>
+                    <input type="radio" id="q2_2_b" name="q2_2" value="B"><label for="q2_2_b">B. Tự động hóa và điều khiển</label>
+                    <input type="radio" id="q2_2_c" name="q2_2" value="C"><label for="q2_2_c">C. Văn phòng</label>
+                    <input type="radio" id="q2_2_d" name="q2_2" value="D"><label for="q2_2_d">D. Hỗ trợ việc quản lý</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q2_3" data-correct="B">
+                <p>Câu 3: Phương án nào sau đây là ứng dụng của máy tính trong lĩnh vực **y tế**?</p>
+                <div class="options">
+                    <input type="radio" id="q2_3_a" name="q2_3" value="A"><label for="q2_3_a">A. Mô phỏng dòng chảy của chất lỏng.</label>
+                    <input type="radio" id="q2_3_b" name="q2_3" value="B"><label for="q2_3_b">B. Chẩn đoán bệnh.</label>
+                    <input type="radio" id="q2_3_c" name="q2_3" value="C"><label for="q2_3_c">C. Điều khiển ô tô tự động lái.</label>
+                    <input type="radio" id="q2_3_d" name="q2_3" value="D"><label for="q2_3_d">D. Dự báo thời tiết.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q2_4" data-correct="C">
+                <p>Câu 4: “Quản lí dữ liệu công dân” là ứng dụng của máy tính trong lĩnh vực:</p>
+                <div class="options">
+                    <input type="radio" id="q2_4_a" name="q2_4" value="A"><label for="q2_4_a">A. Giải trí</label>
+                    <input type="radio" id="q2_4_b" name="q2_4" value="B"><label for="q2_4_b">B. Giáo dục</label>
+                    <input type="radio" id="q2_4_c" name="q2_4" value="C"><label for="q2_4_c">C. Quản lí hành chính</label>
+                    <input type="radio" id="q2_4_d" name="q2_4" value="D"><label for="q2_4_d">D. Tài chính ngân hàng</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q2_5" data-correct="C">
+                <p>Câu 5: Tác động tích cực của máy tính đối với **xã hội, công nghệ thông tin**:</p>
+                <div class="options">
+                    <input type="radio" id="q2_5_a" name="q2_5" value="A"><label for="q2_5_a">A. Mở rộng phạm vi tiếp cận tri thức</label>
+                    <input type="radio" id="q2_5_b" name="q2_5" value="B"><label for="q2_5_b">B. Tạo môi trường học tập linh hoạt và sáng tạo</label>
+                    <input type="radio" id="q2_5_c" name="q2_5" value="C"><label for="q2_5_c">C. Truyền thông và chia sẻ thông tin</label>
+                    <input type="radio" id="q2_5_d" name="q2_5" value="D"><label for="q2_5_d">D. Cung cấp các công cụ giáo dục tiên tiến</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q2_6" data-correct="D">
+                <p>Câu 6: Tác động tích cực của máy tính đối với **giáo dục và đạo tạo**:</p>
+                <div class="options">
+                    <input type="radio" id="q2_6_a" name="q2_6" value="A"><label for="q2_6_a">A. Truyền thông và chia sẻ thông tin</label>
+                    <input type="radio" id="q2_6_b" name="q2_6" value="B"><label for="q2_6_b">B. Phát triển nhiều dịch vụ</label>
+                    <input type="radio" id="q2_6_c" name="q2_6" value="C"><label for="q2_6_c">C. Thúc đẩy phát triển kinh tế</label>
+                    <input type="radio" id="q2_6_d" name="q2_6" value="D"><label for="q2_6_d">D. Mở rộng phạm vi tiếp cận tri thức</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-header">CHỦ ĐỀ C. TỔ CHỨC LƯU TRỮ, TÌM KIẾM VÀ TRAO ĐỔI THÔNG TIN - ĐÁNH GIÁ CHẤT LƯỢNG THÔNG TIN</div>
+
+        <div class="question-group">
+            <h4 style="color: #0056b3;">BÀI 1: MỘT SỐ ĐẶC ĐIỂM QUAN TRỌNG CỦA THÔNG TIN TRONG GIẢI QUYẾT VẤN ĐỀ</h4>
+
+            <h5 style="color: #27ae60;">1. TRẮC NGHIỆM - NHẬN BIẾT (5 câu)</h5>
+
+            <div class="question" data-name="q3_1" data-correct="A">
+                <p>Câu 1: Tính **chính xác** của thông tin giúp:</p>
+                <div class="options">
+                    <input type="radio" id="q3_1_a" name="q3_1" value="A"><label for="q3_1_a">A. Hiểu đúng vấn đề và tìm được cách giải quyết</label>
+                    <input type="radio" id="q3_1_b" name="q3_1" value="B"><label for="q3_1_b">B. Thể hiện đúng thực tế ở thời điểm gần nhất với hiện tại</label>
+                    <input type="radio" id="q3_1_c" name="q3_1" value="C"><label for="q3_1_c">C. Xem xét được một cách toàn diện các khía cạnh liên quan</label>
+                    <input type="radio" id="q3_1_d" name="q3_1" value="D"><label for="q3_1_d">D. Lựa chọn những thông tinh hữu ích, dẫn đến giải pháp có thể thực hiện được</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q3_2" data-correct="D">
+                <p>Câu 2: Tính **sử dụng được** của thông tin giúp:</p>
+                <div class="options">
+                    <input type="radio" id="q3_2_a" name="q3_2" value="A"><label for="q3_2_a">A. Hiểu đúng vấn đề và tìm được cách giải quyết</label>
+                    <input type="radio" id="q3_2_b" name="q3_2" value="B"><label for="q3_2_b">B. Thể hiện đúng thực tế ở thời điểm gần nhất với hiện tại</label>
+                    <input type="radio" id="q3_2_c" name="q3_2" value="C"><label for="q3_2_c">C. Xem xét được một cách toàn diện các khía cạnh liên quan</label>
+                    <input type="radio" id="q3_2_d" name="q3_2" value="D"><label for="q3_2_d">D. Lựa chọn những thông tinh hữu ích, dẫn đến giải pháp có thể thực hiện được</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q3_3" data-correct="C">
+                <p>Câu 3: Tính **đầy đủ** của thông tin giúp:</p>
+                <div class="options">
+                    <input type="radio" id="q3_3_a" name="q3_3" value="A"><label for="q3_3_a">A. Hiểu đúng vấn đề và tìm được cách giải quyết</label>
+                    <input type="radio" id="q3_3_b" name="q3_3" value="B"><label for="q3_3_b">B. Thể hiện đúng thực tế ở thời điểm gần nhất với hiện tại</label>
+                    <input type="radio" id="q3_3_c" name="q3_3" value="C"><label for="q3_3_c">C. Xem xét được một cách toàn diện các khía cạnh liên quan</label>
+                    <input type="radio" id="q3_3_d" name="q3_3" value="D"><label for="q3_3_d">D. Lựa chọn những thông tinh hữu ích, dẫn đến giải pháp có thể thực hiện được</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q3_4" data-correct="B">
+                <p>Câu 4: Tính **cập nhật** của thông tin giúp:</p>
+                <div class="options">
+                    <input type="radio" id="q3_4_a" name="q3_4" value="A"><label for="q3_4_a">A. Hiểu đúng vấn đề và tìm được cách giải quyết</label>
+                    <input type="radio" id="q3_4_b" name="q3_4" value="B"><label for="q3_4_b">B. Thể hiện đúng thực tế ở thời điểm gần nhất với hiện tại</label>
+                    <input type="radio" id="q3_4_c" name="q3_4" value="C"><label for="q3_4_c">C. Xem xét được một cách toàn diện các khía cạnh liên quan</label>
+                    <input type="radio" id="q3_4_d" name="q3_4" value="D"><label for="q3_4_d">D. Lựa chọn những thông tinh hữu ích, dẫn đến giải pháp có thể thực hiện được</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q3_5" data-correct="C">
+                <p>Câu 5: Để có thông tin hữu ích trong giải quyết vấn đề, ta cần quan tâm đến mấy đặc điểm của thông tin?</p>
+                <div class="options">
+                    <input type="radio" id="q3_5_a" name="q3_5" value="A"><label for="q3_5_a">A. 2 đặc điểm</label>
+                    <input type="radio" id="q3_5_b" name="q3_5" value="B"><label for="q3_5_b">B. 3 đặc điểm</label>
+                    <input type="radio" id="q3_5_c" name="q3_5" value="C"><label for="q3_5_c">C. 4 đặc điểm</label>
+                    <input type="radio" id="q3_5_d" name="q3_5" value="D"><label for="q3_5_d">D. 5 đặc điểm</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <h4 style="color: #0056b3;">BÀI 2: CHẤT LƯỢNG THÔNG TIN KHI TÌM KIẾM, TIẾP NHẬN VÀ TRAO ĐỔI THÔNG TIN</h4>
+
+            <h5 style="color: #27ae60;">1. TRẮC NGHIỆM - NHẬN BIẾT (3 câu)</h5>
+
+            <div class="question" data-name="q4_1" data-correct="C">
+                <p>Câu 1: Có mấy yếu tố quan trọng trong chất lượng thông tin?</p>
+                <div class="options">
+                    <input type="radio" id="q4_1_a" name="q4_1" value="A"><label for="q4_1_a">A. 2 yếu tố</label>
+                    <input type="radio" id="q4_1_b" name="q4_1" value="B"><label for="q4_1_b">B. 3 yếu tố</label>
+                    <input type="radio" id="q4_1_c" name="q4_1" value="C"><label for="q4_1_c">C. 4 yếu tố</label>
+                    <input type="radio" id="q4_1_d" name="q4_1" value="D"><label for="q4_1_d">D. 5 yếu tố</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q4_2" data-correct="D">
+                <p>Câu 2: Nhận định nào sau đây là **đúng**?</p>
+                <div class="options">
+                    <input type="radio" id="q4_2_a" name="q4_2" value="A"><label for="q4_2_a">A. Trong giải quyết vấn đề, mọi thông tin tìm được đều giúp đạt được mục tiêu</label>
+                    <input type="radio" id="q4_2_b" name="q4_2" value="B"><label for="q4_2_b">B. Chất lượng thông tin chỉ bị ảnh hưởng bởi hai yếu tố là tính chính xác và tính đầy đủ</label>
+                    <input type="radio" id="q4_2_c" name="q4_2" value="C"><label for="q4_2_c">C. Khi tìm kiếm, tiếp nhận và thu thập thông tin có chất lượng chỉ cần quan tâm đến tính mưới và tính sử dụng được của thông tin</label>
+                    <input type="radio" id="q4_2_d" name="q4_2" value="D"><label for="q4_2_d">D. Tìm kiếm, tiếp nhận và thu thập thông tin có chất lượng giúp tìm được nhiều giải pháp</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q4_3" data-correct="A">
+                <p>Câu 3: Tìm kiếm, tiếp nhận và thu thập thông tin cần quan tâm đến:</p>
+                <div class="options">
+                    <input type="radio" id="q4_3_a" name="q4_3" value="A"><label for="q4_3_a">A. Chất lượng thông tin</label>
+                    <input type="radio" id="q4_3_b" name="q4_3" value="B"><label for="q4_3_b">B. Cách trình bày thông tin</label>
+                    <input type="radio" id="q4_3_c" name="q4_3" value="C"><label for="q4_3_c">C. Độ dài/ngắn của thông tin</label>
+                    <input type="radio" id="q4_3_d" name="q4_3" value="D"><label for="q4_3_d">D. Yếu tố hài hước của thông tin</label>
+                </div>
+            </div>
+
+            <h5 style="color: #27ae60; margin-top: 30px;">2. THÔNG HIỂU (5 CÂU)</h5>
+
+            <div class="question" data-name="q4_4" data-correct="B">
+                <p>Câu 1: Tiêu chí nào sau đây **không** được dùng để đánh giá chất lượng thông tin?</p>
+                <div class="options">
+                    <input type="radio" id="q4_4_a" name="q4_4" value="A"><label for="q4_4_a">A. Tính sử dụng được.</label>
+                    <input type="radio" id="q4_4_b" name="q4_4" value="B"><label for="q4_4_b">B. Tính hấp dẫn.</label>
+                    <input type="radio" id="q4_4_c" name="q4_4" value="C"><label for="q4_4_c">C. Tính cập nhật.</label>
+                    <input type="radio" id="q4_4_d" name="q4_4" value="D"><label for="q4_4_d">D. Tính đầy đủ.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q4_5" data-correct="C">
+                <p>Câu 2: Phát biểu nào sau đây **sai**?</p>
+                <div class="options">
+                    <input type="radio" id="q4_5_a" name="q4_5" value="A"><label for="q4_5_a">A. Internet là một kho thông tin khổng lồ.</label>
+                    <input type="radio" id="q4_5_b" name="q4_5" value="B"><label for="q4_5_b">B. Cần phải quan tâm đến chất lượng thông tin khi tìm kiếm, tiếp nhận, trao đổi và sử dụng thông tin để có thể đưa ra các quyết định đúng đắn.</label>
+                    <input type="radio" id="q4_5_c" name="q4_5" value="C"><label for="q4_5_c">C. Số lượng bản tin làm cho thông tin trở thành hữu ích.</label>
+                    <input type="radio" id="q4_5_d" name="q4_5" value="D"><label for="q4_5_d">D. Em có thể tìm thấy nhiều thông tin trên Internet nhưng không phải thông tin nào cũng có thể sử dụng để giải quyết vấn đề.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q4_6" data-correct="B">
+                <p>Câu 3: Phát biểu nào sau đây **sai**?</p>
+                <div class="options">
+                    <input type="radio" id="q4_6_a" name="q4_6" value="A"><label for="q4_6_a">A. Thông tin là cơ sở để ra quyết định.</label>
+                    <input type="radio" id="q4_6_b" name="q4_6" value="B"><label for="q4_6_b">B. Chất lượng thông tin trên Internet thể hiện ở số lượng người đọc.</label>
+                    <input type="radio" id="q4_6_c" name="q4_6" value="C"><label for="q4_6_c">C. Không phải thông tin nào trên Internet cũng hữu ích đối với việc giải quyết vấn đề.</label>
+                    <input type="radio" id="q4_6_d" name="q4_6" value="D"><label for="q4_6_d">D. Nếu thông tin không liên quan tới vấn đề được đặt ra thì em sẽ không sử dụng được và thông tin trở nên vô ích.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q4_7" data-correct="D">
+                <p>Câu 4: Nguồn thông tin nào sau đây là **đáng tin cậy nhất**?</p>
+                <div class="options">
+                    <input type="radio" id="q4_7_a" name="q4_7" value="A"><label for="q4_7_a">A. Ý kiến của người thân.</label>
+                    <input type="radio" id="q4_7_b" name="q4_7" value="B"><label for="q4_7_b">B. Các loại sách tham khảo phổ biến trên thị trường.</label>
+                    <input type="radio" id="q4_7_c" name="q4_7" value="C"><label for="q4_7_c">C. Những chia sẻ cá nhân trên Internet.</label>
+                    <input type="radio" id="q4_7_d" name="q4_7" value="D"><label for="q4_7_d">D. Sách giáo khoa do Nhà xuất bản Giáo dục Việt Nam phát hành.</label>
+                </div>
+            </div>
+
+            <div class="question" data-name="q4_8" data-correct="C">
+                <p>Câu 5: Thông tin nào dưới đây là thông tin **đảm bảo chất lượng nhất**?</p>
+                <div class="options">
+                    <input type="radio" id="q4_8_a" name="q4_8" value="A"><label for="q4_8_a">A. Thông tin về máy tính thông tin trên một trang web lạ</label>
+                    <input type="radio" id="q4_8_b" name="q4_8" value="B"><label for="q4_8_b">B. Thông tin về dịch Covid 19 trên trang cá nhân của một người ẩn danh</label>
+                    <input type="radio" id="q4_8_c" name="q4_8" value="C"><label for="q4_8_c">C. Thông tin về chế độ dinh dưỡng trên trang web của bộ y tế năm 2023</label>
+                    <input type="radio" id="q4_8_d" name="q4_8" value="D"><label for="q4_8_d">D. Đáp án khác</label>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    <div class="controls" style="justify-content: center;">
+        <button id="submit-btn-bottom" onclick="submitQuiz()">Nộp Bài</button>
+    </div>
+
+    <footer class="footer">
+        <p>Tài liệu ôn tập Tin học 9 - Học kỳ 1 - Năm học 2025-2026</p>
+        <p>Biên soạn: Trần Văn Dẽ - GV Tin học THCS Xuân Thới Thượng - Hóc Môn - TPHCM | SĐT: 0976.743.983</p>
+        <p style="color: #e74c3c; font-weight: bold;">CHÚC CÁC EM ÔN TẬP TỐT VÀ ĐẠT KẾT QUẢ CAO!</p>
+    </footer>
+
+</div>
+
+<script>
+    const TIME_LIMIT = 15 * 60; // 15 phút tính bằng giây
+    let timeRemaining = TIME_LIMIT;
+    let timerInterval;
+    let quizSubmitted = false;
+    const totalQuestions = document.querySelectorAll('.question').length;
+    const questions = document.querySelectorAll('.question');
+
+    // Mảng lưu trữ đáp án đã chọn (sẽ sử dụng khi xem lại)
+    const userAnswers = {}; 
+
+    // 1. CHỨC NĂNG ĐỒNG HỒ
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('time').textContent = "Hết giờ!";
+                alert("Hết giờ làm bài! Hệ thống tự động nộp bài.");
+                submitQuiz();
+                return;
+            }
+
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('time').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            timeRemaining--;
+        }, 1000);
+    }
+
+    // 2. CHỨC NĂNG NỘP BÀI
+    function submitQuiz() {
+        if (quizSubmitted) return; 
+
+        clearInterval(timerInterval);
+        quizSubmitted = true;
+        let score = 0;
+        
+        questions.forEach(question => {
+            const qName = question.dataset.name;
+            const correctAnswer = question.dataset.correct;
+            const selectedAnswer = document.querySelector(`input[name="${qName}"]:checked`)?.value;
+
+            // Lưu đáp án của người dùng
+            userAnswers[qName] = selectedAnswer;
+
+            // Chấm điểm
+            if (selectedAnswer === correctAnswer) {
+                score++;
+            }
+            
+            // Vô hiệu hóa input sau khi nộp bài
+            question.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.disabled = true;
+            });
+        });
+
+        const resultsBox = document.getElementById('results');
+        const pointsPerQuestion = 10 / totalQuestions; 
+        const totalScore = (score * pointsPerQuestion).toFixed(2);
+        
+        resultsBox.innerHTML = `
+            🎉 **KẾT QUẢ BÀI LÀM** 🎉
+            <br>
+            Tổng số câu: **${totalQuestions}**
+            <br>
+            Số câu đúng: **${score}**
+            <br>
+            Điểm số: **${totalScore} / 10**
+        `;
+        resultsBox.style.display = 'block';
+
+        // Ẩn nút Nộp bài, hiện nút Xem lại
+        document.getElementById('submit-btn').style.display = 'none';
+        document.getElementById('submit-btn-bottom').style.display = 'none';
+        document.getElementById('review-btn').style.display = 'inline-block';
+    }
+
+    // 3. CHỨC NĂNG XEM LẠI BÀI LÀM
+    function reviewAnswers() {
+        questions.forEach(question => {
+            const qName = question.dataset.name;
+            const correctAnswer = question.dataset.correct;
+            const selectedAnswer = userAnswers[qName];
+            
+            // Xóa màu cũ
+            question.querySelectorAll('label').forEach(label => {
+                label.classList.remove('result-correct', 'result-incorrect');
+            });
+
+            // Tô màu đáp án đúng (tô màu label)
+            const correctLabel = question.querySelector(`input[value="${correctAnswer}"] + label`);
+            if (correctLabel) {
+                correctLabel.classList.add('result-correct');
+            }
+
+            // Nếu người dùng chọn sai, tô màu đáp án đã chọn (màu đỏ)
+            if (selectedAnswer && selectedAnswer !== correctAnswer) {
+                const incorrectLabel = question.querySelector(`input[value="${selectedAnswer}"] + label`);
+                if (incorrectLabel) {
+                    incorrectLabel.classList.add('result-incorrect');
+                }
+            }
+        });
+        alert("Đã đánh dấu đáp án đúng (Màu Xanh Lá) và đáp án bạn chọn sai (Màu Đỏ)!");
+    }
+
+    // 4. CHỨC NĂNG RESET
+    function resetQuiz() {
+        if (confirm("Bạn có chắc chắn muốn làm lại bài? Mọi dữ liệu đã làm sẽ bị mất.")) {
+            location.reload(); // Tải lại trang để reset toàn bộ
+        }
+    }
+
+    // 5. KHỞI CHẠY
+    document.addEventListener('DOMContentLoaded', startTimer);
+</script>
+
+</body>
+</html>
